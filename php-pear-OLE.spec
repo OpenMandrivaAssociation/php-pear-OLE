@@ -13,6 +13,7 @@ Source0:	http://download.pear.php.net/package/%{upstream_name}-%{version}%{pre}.
 Requires(post): php-pear
 Requires(preun): php-pear
 Requires:	php-pear
+BuildRequires:	php-pear
 BuildArch:	noarch
 BuildRoot:	%{_tmppath}/%{name}-%{version}
 
