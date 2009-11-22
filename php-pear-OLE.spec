@@ -1,21 +1,20 @@
 %define		_class		OLE
-%define		_status		beta
-%define		_pearname	%{_class}
+%define		upstream_name	%{_class}
 %define		pre       RC1
 
-Summary:	%{_pearname} - package for reading and writing OLE containers
-Name:		php-pear-%{_pearname}
+Name:		php-pear-%{upstream_name}
 Version:	1.0.0
-Release:	%mkrel 0.%{pre}.1
+Release:	%mkrel 0.%{pre}.2
+Summary:	Package for reading and writing OLE containers
 License:	PHP License
 Group:		Development/PHP
-Source0:	http://pear.php.net/get/%{_pearname}-%{version}%{pre}.tgz
 URL:		http://pear.php.net/package/OLE/
+Source0:	http://download.pear.php.net/package/%{upstream_name}-%{version}%{pre}.tgz
 Requires(post): php-pear
 Requires(preun): php-pear
 Requires:	php-pear
 BuildArch:	noarch
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRoot:	%{_tmppath}/%{name}-%{version}
 
 %description
 This package allows reading and writing of OLE (Object Linking and
@@ -23,57 +22,42 @@ Embedding) files, the format used as container for Excel, Word and
 other MS file formats. Documentation for the OLE format can be found
 at: http://user.cs.tu-berlin.de/~schwartz/pmh/guide.html .
 
-In PEAR status of this package is: %{_status}.
-
 %prep
 %setup -q -c
+mv package.xml %{upstream_name}-%{version}%{pre}/%{upstream_name}.xml
 
 %install
 rm -rf %{buildroot}
 
-install -d %{buildroot}%{_datadir}/pear/
-install -m 644 %{_pearname}-%{version}%{pre}/%{_class}.php \
-    %{buildroot}%{_datadir}/pear
+cd %{upstream_name}-%{version}%{pre}
+pear install --nodeps --packagingroot %{buildroot} %{upstream_name}.xml
+rm -rf %{buildroot}%{_datadir}/pear/.??*
 
-install -d %{buildroot}%{_datadir}/pear/%{_class}
-install -m 644 %{_pearname}-%{version}%{pre}/PPS.php \
-    %{buildroot}%{_datadir}/pear/%{_class}
-install -m 644 %{_pearname}-%{version}%{pre}/ChainedBlockStream.php \
-    %{buildroot}%{_datadir}/pear/%{_class}
-
-install -d %{buildroot}%{_datadir}/pear/%{_class}/PPS
-install -m 644 %{_pearname}-%{version}%{pre}/PPS/*.php \
-    %{buildroot}%{_datadir}/pear/%{_class}/PPS
+rm -rf %{buildroot}%{_datadir}/pear/docs
+rm -rf %{buildroot}%{_datadir}/pear/tests
 
 install -d %{buildroot}%{_datadir}/pear/packages
-install -m0644 package.xml %{buildroot}%{_datadir}/pear/packages/%{_pearname}.xml
-
-%post
-if [ "$1" = "1" ]; then
-	if [ -x %{_bindir}/pear -a -f %{_datadir}/pear/packages/%{_pearname}.xml ]; then
-		%{_bindir}/pear install --nodeps -r %{_datadir}/pear/packages/%{_pearname}.xml
-	fi
-fi
-if [ "$1" = "2" ]; then
-	if [ -x %{_bindir}/pear -a -f %{_datadir}/pear/packages/%{_pearname}.xml ]; then
-		%{_bindir}/pear upgrade -f --nodeps -r %{_datadir}/pear/packages/%{_pearname}.xml
-	fi
-fi
-
-%preun
-if [ "$1" = 0 ]; then
-	if [ -x %{_bindir}/pear -a -f %{_datadir}/pear/packages/%{_pearname}.xml ]; then
-		%{_bindir}/pear uninstall --nodeps -r %{_pearname}
-	fi
-fi
+install -m 644 %{upstream_name}.xml %{buildroot}%{_datadir}/pear/packages
 
 %clean
 rm -rf %{buildroot}
+
+%post
+%if %mdkversion < 201000
+pear install --nodeps --soft --force --register-only \
+    %{_datadir}/pear/packages/%{upstream_name}.xml >/dev/null || :
+%endif
+
+%preun
+%if %mdkversion < 201000
+if [ "$1" -eq "0" ]; then
+    pear uninstall --nodeps --ignore-errors --register-only \
+        %{pear_name} >/dev/null || :
+fi
+%endif
 
 %files
 %defattr(-,root,root)
 %{_datadir}/pear/%{_class}.php
 %{_datadir}/pear/%{_class}
-%{_datadir}/pear/packages/%{_pearname}.xml
-
-
+%{_datadir}/pear/packages/%{upstream_name}.xml
