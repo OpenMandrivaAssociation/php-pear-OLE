@@ -4,7 +4,7 @@
 
 Name:		php-pear-%{upstream_name}
 Version:	1.0.0
-Release:	%mkrel 0.%{pre}.2
+Release:	%mkrel 0.%{pre}.3
 Summary:	Package for reading and writing OLE containers
 License:	PHP License
 Group:		Development/PHP
