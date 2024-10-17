@@ -8,7 +8,7 @@ Release:	0.%{pre}.6
 Summary:	Package for reading and writing OLE containers
 License:	PHP License
 Group:		Development/PHP
-URL:		http://pear.php.net/package/OLE/
+URL:		https://pear.php.net/package/OLE/
 Source0:	http://download.pear.php.net/package/%{upstream_name}-%{version}%{pre}.tgz
 Requires(post): php-pear
 Requires(preun): php-pear
